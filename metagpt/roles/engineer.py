@@ -72,7 +72,7 @@ class Engineer(Role):
     @classmethod
     def parse_workspace(cls, system_design_msg: Message) -> str:
         if system_design_msg.instruct_content:
-            return system_design_msg.instruct_content.dict().get("Python package name")
+            return system_design_msg.instruct_content.dict().get("Python package name").strip().strip("'").strip("\"")
         return CodeParser.parse_str(block="Python package name", text=system_design_msg.content)
 
     def get_workspace(self) -> Path:
@@ -93,6 +93,7 @@ class Engineer(Role):
 
     def write_file(self, filename: str, code: str):
         workspace = self.get_workspace()
+        filename = filename.replace('"', '').replace('\n', '')
         file = workspace / filename
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(code)
